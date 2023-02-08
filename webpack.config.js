@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const EslintPlugin = require('eslint-webpack-plugin');
 
 
@@ -25,13 +24,13 @@ module.exports = {
         include: [path.resolve(__dirname, "src")]
       },
       //json loader
-      {
-        test: /\.(json)$/i,
-        type: "asset/resource",
-        generator: {
-          filename: 'resources/[name][ext]'
-        }
-      },
+      // {
+      //   test: /\.(json)$/i,
+      //   type: "asset/resource",
+      //   generator: {
+      //     filename: 'resources/[name][ext]'
+      //   }
+      // }
     ]
   },
   resolve: {
@@ -42,10 +41,11 @@ module.exports = {
     path: path.resolve(__dirname, "build"),
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './src/index.html'),
-      filename: 'index.html',
-  }),
     new EslintPlugin({ extensions: 'ts' }),
 ],
+"externals": {
+  "express": "require('express')",
+  "fs": "require('fs')",
+  "path": "require('path')"
+}
 };

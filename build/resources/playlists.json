@@ -2,16 +2,19 @@
   {
     "userId": 1,
     "likedPodcasts": [],
+    "subscribedPodcasts": [],
     "playlist1": []
   },
   {
     "userId": 2,
     "likedPodcasts": [],
+    "subscribedPodcasts": [],
     "playlist1": []
   },
   {
     "userId": 3,
     "likedPodcasts": [],
+    "subscribedPodcasts": [],
     "playlist1": []
   }
 ]
