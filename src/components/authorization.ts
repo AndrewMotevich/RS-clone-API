@@ -1,16 +1,19 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-var-requires */
-// @ts-ignore
-// @ts-nocheck
+import { user, address } from './type';
 import * as fs from 'fs';
-import * as express from 'express';
+import express from 'express';
 import * as path from 'path';
 
 function authorization() {
-// const express = require("express");
-// const fs = require("fs");
 const app = express();
 const pathToBuild = path.resolve() + "\\build\\resources\\";
+
+// const hash = (string: string) => {
+//   let result = 0;
+//   for (let i = 0; i < string.length; i++) {
+//       result += string.charCodeAt(i)+7;
+//   }
+//   return result;
+// };
 
 app.use(express.json());
 
@@ -26,12 +29,12 @@ app.post("/addUser", function (req, res) {
   const reqData = req.body;
   fs.readFile(pathToBuild + "users.json", "utf8", function (err, data) {
     try {
-      const newData = JSON.parse(data);
+      const newData = JSON.parse(data) as user[];
       const newId = newData[`${newData.length - 1}`].id + 1;
-      newData.forEach((elem) => {
+      newData.forEach(elem => {
         if (elem.email === reqData.email) {
+          res.status(500);
           res.end('THIS EMAIL EXIST');
-          throw new Error('Error: this email exist');
         }
       });
       reqData.id = newId;
@@ -47,26 +50,32 @@ app.post("/addUser", function (req, res) {
   });
 });
 
-app.get("/:id", function (req, res) {
+app.get("/:email", function (req, res) {
   // First read existing users.
   fs.readFile(pathToBuild + "users.json", "utf8", function (err, data) {
-    const users = JSON.parse(data);
+    const users = JSON.parse(data) as user[];
     let user = {};
     users.forEach((elem) => {
-      if ((elem.id = req.params.id)) {
+      if ((elem.email == req.params.email)) {
         user = elem;
       }
     });
-    res.end(JSON.stringify(user));
+    if (Object.keys(user).length === 0) {
+      res.status(404);
+      res.end('Not such user or incorrect email');
+    }
+    else {
+      res.end(JSON.stringify(user));
+    }
   });
 });
 
 app.delete('/deleteUser/:id', function (req, res) {
   // First read existing users.
   fs.readFile(pathToBuild + "users.json", 'utf8', function (err, data) {
-     const newData = JSON.parse( data );
+     const newData = JSON.parse( data ) as user[];
      newData.forEach((elem, index) => {
-       if (elem.id == req.params.id){
+       if (elem.id == Number(req.params.id)){
          console.log(elem.id);
          console.log(req.params.id);
          newData.splice(index, 1);
@@ -83,8 +92,8 @@ app.delete('/deleteUser/:id', function (req, res) {
 });
 
 const server = app.listen(8081, function () {
-  const host = server.address().address;
-  const port = server.address().port;
+  const host = (server.address() as address).address;
+  const port = (server.address() as address ).port;
   console.log("Example app listening at http://%s:%s", host, port);
 });
 }

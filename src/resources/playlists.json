@@ -1,20 +1,20 @@
 [
   {
     "userId": 1,
-    "likedPodcasts": [],
-    "subscribedPodcasts": [],
-    "playlist1": []
+    "likedPodcasts": [{"id": 13387515273}],
+    "subscribedPodcasts": [{"id": 5723904}],
+    "playlist1": [{"id": 13330914891}, {"id": 13387460226}, {"id": 10548558719}]
   },
   {
     "userId": 2,
-    "likedPodcasts": [],
-    "subscribedPodcasts": [],
-    "playlist1": []
+    "likedPodcasts": [{"id": 13387508685}],
+    "subscribedPodcasts": [{"id": 180707}],
+    "playlist1": [{"id": 13387436769}, {"id": 13387460227}, {"id": 10548519672}]
   },
   {
     "userId": 3,
-    "likedPodcasts": [],
-    "subscribedPodcasts": [],
-    "playlist1": []
+    "likedPodcasts": [{"id": 12393581619}],
+    "subscribedPodcasts": [{"id": 3103401}],
+    "playlist1": [{"id": 13387425883}, {"id": 10549014669}, {"id": 10548545683}]
   }
 ]
