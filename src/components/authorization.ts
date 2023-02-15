@@ -27,7 +27,7 @@ function authorization() {
     app.use(cookieParser());
 
     app.get('/listUsers', function (req, res) {
-      if (req.headers['adminPass'] === "root"){
+      if (req.headers['admin-pass'] === "root"){
         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
             console.log(pathToBuild);
             res.end(data);
@@ -40,7 +40,7 @@ function authorization() {
     });
 
     app.post('/addUser', function (req, res) {
-      if(req.cookies['is-logged-in'] === 'true'){
+      if(req.cookies['is-logged-in'] === 'false'){
         // First read existing users.
         const reqData = req.body;
         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
@@ -69,7 +69,7 @@ function authorization() {
       }
       else {
         res.status(500);
-        res.end('You are not logged');
+        res.end('You are logged in, please, sign out');
       }
     });
 
@@ -130,13 +130,13 @@ function authorization() {
         }
         else {
           res.status(500);
-          res.end('You are not logged or incorrect id');
+          res.end('You are not logged in or incorrect id');
         }
     });
 
     app.patch('/updateUser', function (req, res) {
-      if(req.cookies['is-logged-in'] === 'true'){
-        const reqData = req.body as user;
+      const reqData = req.body as user;
+      if(req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === reqData.id.toString()){
         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
             try {
                 const newData = JSON.parse(data) as user[];
@@ -168,7 +168,7 @@ function authorization() {
       }
       else {
         res.status(500);
-        res.end('You are not logged');
+        res.end('You are not logged in or incorrect logged in user(you cant update other users)');
       }
     });
 

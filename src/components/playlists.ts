@@ -11,7 +11,6 @@ app1.use(express.json());
 
 app1.get("/allPlaylists", function (req, res) {
   fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
-    console.log(pathToBuild);
     res.end(data);
   });
 });
@@ -42,39 +41,18 @@ app1.get("/allPlaylists", function (req, res) {
 //   });
 // });
 
-app1.get("/:id/:playlist", function (req, res) {
-  // First read existing users.
-  fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
-    // const users = JSON.parse(data);
-    // let user = {};
-    // users.forEach((elem) => {
-    //   if ((elem.id = req.params.id)) {
-    //     user = elem;
-    //   }
-    // });
-    console.log(req.params);
-    res.end(JSON.stringify(req.params));
-  });
-});
-
-// app.delete('/deletePodcast/:id&&:playlist', function (req, res) {
+// app1.get("/:id/:playlist", function (req, res) {
 //   // First read existing users.
-//   fs.readFile(pathToBuild + "playlist.json", 'utf8', function (err, data) {
-//      const newData = JSON.parse( data );
-//      newData.forEach((elem, index) => {
-//        if (elem.id == req.params.id){
-//          console.log(elem.id);
-//          console.log(req.params.id);
-//          newData.splice(index, 1);
-//         fs.writeFile(
-//           pathToBuild + "playlist.json",
-//           JSON.stringify(newData),
-//           {},
-//           (err) => {return err;}
-//         );
-//       }
-//      });
-//      res.end( JSON.stringify(newData));
+//   fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
+//     // const users = JSON.parse(data);
+//     // let user = {};
+//     // users.forEach((elem) => {
+//     //   if ((elem.id = req.params.id)) {
+//     //     user = elem;
+//     //   }
+//     // });
+//     console.log(req.params);
+//     res.end(JSON.stringify(req.params));
 //   });
 // });
 
