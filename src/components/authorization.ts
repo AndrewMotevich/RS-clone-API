@@ -29,7 +29,7 @@ function authorization() {
 
     app.get('/listUsers', function (req, res) {
       if (req.headers['admin-pass'] === "root"){
-        fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
+        fs.readFile('/' + 'users.json', 'utf8', function (err, data) {
             console.log(pathToBuild);
             res.end(data);
         });
