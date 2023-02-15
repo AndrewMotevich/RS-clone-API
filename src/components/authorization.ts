@@ -8,7 +8,7 @@ import * as path from 'path';
 function authorization() {
     const app = express();
     // const pathToBuild = path.resolve() + '\\build\\resources\\';
-    const pathToBuild = path.resolve()+ '\\resources\\';
+    const pathToBuild = path.resolve();
 
     const hash = (string: string) => {
         let result = 0;
