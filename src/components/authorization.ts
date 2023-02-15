@@ -7,8 +7,7 @@ import * as path from 'path';
 
 function authorization() {
     const app = express();
-    // const pathToBuild = path.resolve() + '\\build\\resources\\';
-    const pathToBuild = path.resolve();
+    const pathToBuild = path.resolve() + '/build/resources/';
 
     const hash = (string: string) => {
         let result = 0;
@@ -29,25 +28,8 @@ function authorization() {
 
     app.get('/listUsers', function (req, res) {
       if (req.headers['admin-pass'] === "root"){
-        fs.readFile('/users.json', 'utf8', function (err, data) {
-            console.log('1', data);
-            console.log(__dirname);
-            res.end(data);
-        });
         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-            console.log('2',data);
-            res.end(data);
-        });
-        fs.readFile(__dirname + '/' + 'users.json', 'utf8', function (err, data) {
-            console.log('3',data);
-            res.end(data);
-        });
-        fs.readFile(pathToBuild + '\\build\\resources\\' + 'users.json', 'utf8', function (err, data) {
-            console.log('4',data);
-            res.end(data);
-        });
-        fs.readFile(pathToBuild + '/build/resources/' + 'users.json', 'utf8', function (err, data) {
-            console.log('5',data);
+            console.log('1', data);
             res.end(data);
         });
       }
