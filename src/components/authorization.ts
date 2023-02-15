@@ -30,8 +30,24 @@ function authorization() {
     app.get('/listUsers', function (req, res) {
       if (req.headers['admin-pass'] === "root"){
         fs.readFile('/users.json', 'utf8', function (err, data) {
-            console.log(data);
+            console.log('1', data);
             console.log(__dirname);
+            res.end(data);
+        });
+        fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
+            console.log('2',data);
+            res.end(data);
+        });
+        fs.readFile(__dirname + '/' + 'users.json', 'utf8', function (err, data) {
+            console.log('3',data);
+            res.end(data);
+        });
+        fs.readFile(pathToBuild + '\\build\\resources\\' + 'users.json', 'utf8', function (err, data) {
+            console.log('4',data);
+            res.end(data);
+        });
+        fs.readFile(pathToBuild + '/build/resources/' + 'users.json', 'utf8', function (err, data) {
+            console.log('5',data);
             res.end(data);
         });
       }
