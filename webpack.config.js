@@ -45,6 +45,9 @@ module.exports = {
 ],
 "externals": {
   "express": "require('express')",
+  "cookieParser": "require('cookie-parser')",
+  "cors": "require('cors')",
+  "crypto": "require('crypto')",
   "fs": "require('fs')",
   "path": "require('path')"
 }

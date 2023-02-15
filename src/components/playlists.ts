@@ -1,11 +1,9 @@
-import { user, address } from './type';
+import { address } from './type';
 import * as fs from 'fs';
 import express from 'express';
 import * as path from 'path';
 
 function playlist() {
-// const express = require("express");
-// const fs = require("fs");
 const app1 = express();
 const pathToBuild = path.resolve() + "\\build\\resources\\";
 
