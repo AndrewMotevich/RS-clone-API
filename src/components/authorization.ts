@@ -1,9 +1,7 @@
 import { user, address } from './type';
-import * as fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import * as path from 'path';
 
 function authorization() {
     const app = express();
