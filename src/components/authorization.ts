@@ -26,7 +26,7 @@ function authorization() {
         for (let i = 0; i < string.length; i++) {
             result += string.charCodeAt(i) + 7;
         }
-        return result;
+        return result.toString();
     };
 
     app.use(express.json());
@@ -48,13 +48,12 @@ function authorization() {
             const reqData = req.body as user;
             //check email
             findOneByUserName(reqData.email).then(async (data) => {
-                if (data != null) {
+                if (data != null && Object.keys(reqData).length === 4) {
                     await client.db('myDatabase').collection('users').insertOne(reqData);
                     res.end(JSON.stringify(reqData));
-                }
-                else {
-                  res.status(500);
-                  res.end("This user exist");
+                } else {
+                    res.status(500);
+                    res.end('This user exist');
                 }
             });
         } else {
@@ -63,101 +62,99 @@ function authorization() {
         }
     });
 
-    app.get('/:email', function (req, res) {
-        fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-            const users = JSON.parse(data) as user[];
-            let user = {};
-            users.forEach((elem) => {
-                if (elem.email === req.params.email) {
-                    if (
-                        req.cookies['email'] != undefined &&
-                        req.cookies['email'] === hash(req.params.email).toString()
-                    ) {
-                        user = elem;
-                        console.log('From cookies: ', req.cookies);
-                    } else {
-                        const elemHash = hash(elem.userPassword);
-                        if (Number(req.headers['hash-pass']) === elemHash) {
-                            res.cookie('email', `${hash(req.params.email)}`);
-                            res.cookie('is-logged-in', 'true');
-                            res.cookie('id', `${elem.id}`);
-                            user = elem;
-                        } else {
-                            res.status(500);
-                        }
-                    }
-                }
-            });
-            if (Object.keys(user).length === 0) {
-                if (res.statusCode === 500) {
-                    res.end('Incorrect password');
-                } else {
-                    res.status(404);
-                    res.end('Not such user or incorrect email');
-                }
+    app.get('/:email', async function (req, res) {
+        const user = await client
+            .db('myDatabase')
+            .collection('users')
+            .findOne({ userName: `${req.params.email}` });
+        try {
+            if (user === null) {
+                res.status(404);
+                res.end('This user do not exist or incorrect email');
             } else {
-                res.end(JSON.stringify(user));
-            }
-        });
-    });
-
-    app.delete('/deleteUser/:id', function (req, res) {
-        // First read existing users.
-        if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === req.params.id.toString()) {
-            fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-                const newData = JSON.parse(data) as user[];
-                newData.forEach((elem, index) => {
-                    if (elem.id == Number(req.params.id)) {
-                        newData.splice(index, 1);
-                        fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
-                            return err;
-                        });
+                if (
+                    req.cookies['email'] != undefined &&
+                    req.cookies['email'] === hash(req.params.email).toString() &&
+                    req.cookies['is-logged-in'] === 'true'
+                ) {
+                    console.log('Get from cookies: ', req.cookies);
+                    res.end(JSON.stringify(user));
+                } else {
+                    const userHashPassword = hash(user.userPassword);
+                    if (req.headers['hash-pass'] === userHashPassword) {
+                        res.cookie('email', `${hash(req.params.email)}`);
+                        res.cookie('is-logged-in', 'true');
+                        res.cookie('id', `${user._id}`);
+                        res.end(JSON.stringify(user));
                     }
-                });
-                res.end(JSON.stringify(newData));
-            });
-        } else {
-            res.status(500);
-            res.end('You are not logged in or incorrect id');
-        }
-    });
-
-    app.patch('/updateUser', function (req, res) {
-        const reqData = req.body as user;
-        if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === reqData.id.toString()) {
-            fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-                try {
-                    const newData = JSON.parse(data) as user[];
-                    let exist = false;
-                    newData.forEach((elem) => {
-                        if (elem.email === reqData.email && elem.id !== reqData.id) {
-                            res.status(500);
-                        } else if (elem.id === reqData.id) {
-                            elem.email = reqData.email;
-                            elem.phone = reqData.phone;
-                            elem.userName = reqData.userName;
-                            elem.userPassword = reqData.userPassword;
-                            exist = true;
-                        }
-                    });
-                    if (exist === false || res.statusCode === 500) {
+                    else {
                         res.status(500);
-                        res.end("This user don't exist");
-                    } else {
-                        fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
-                            return err;
-                        });
-                        res.end(JSON.stringify(newData));
+                        res.end('Incorrect password');
                     }
-                } catch (err) {
-                    return err;
                 }
-            });
-        } else {
+            }
+        } catch (err) {
             res.status(500);
-            res.end('You are not logged in or incorrect logged in user(you cant update other users)');
+            res.end(err);
         }
     });
+
+    // app.delete('/deleteUser/:id', function (req, res) {
+    //     if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === req.params.id.toString()) {
+    //         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
+    //             const newData = JSON.parse(data) as user[];
+    //             newData.forEach((elem, index) => {
+    //                 if (elem.id == Number(req.params.id)) {
+    //                     newData.splice(index, 1);
+    //                     fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
+    //                         return err;
+    //                     });
+    //                 }
+    //             });
+    //             res.end(JSON.stringify(newData));
+    //         });
+    //     } else {
+    //         res.status(500);
+    //         res.end('You are not logged in or incorrect id');
+    //     }
+    // });
+
+    // app.patch('/updateUser', function (req, res) {
+    //     const reqData = req.body as user;
+    //     if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === reqData.id.toString()) {
+    //         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
+    //             try {
+    //                 const newData = JSON.parse(data) as user[];
+    //                 let exist = false;
+    //                 newData.forEach((elem) => {
+    //                     if (elem.email === reqData.email && elem.id !== reqData.id) {
+    //                         res.status(500);
+    //                     } else if (elem.id === reqData.id) {
+    //                         elem.email = reqData.email;
+    //                         elem.phone = reqData.phone;
+    //                         elem.userName = reqData.userName;
+    //                         elem.userPassword = reqData.userPassword;
+    //                         exist = true;
+    //                     }
+    //                 });
+    //                 if (exist === false || res.statusCode === 500) {
+    //                     res.status(500);
+    //                     res.end("This user don't exist");
+    //                 } else {
+    //                     fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
+    //                         return err;
+    //                     });
+    //                     res.end(JSON.stringify(newData));
+    //                 }
+    //             } catch (err) {
+    //                 return err;
+    //             }
+    //         });
+    //     } else {
+    //         res.status(500);
+    //         res.end('You are not logged in or incorrect logged in user(you cant update other users)');
+    //     }
+    // });
 
     const server = app.listen(8081, function () {
         const host = (server.address() as address).address;

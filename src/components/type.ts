@@ -41,7 +41,6 @@ type episode = {
 };
 
 type user = {
-    id: number;
     userName: string;
     userPassword: string;
     email: string;
