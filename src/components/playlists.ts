@@ -1,19 +1,16 @@
 import { address } from './type';
-import * as fs from 'fs';
 import express from 'express';
-import * as path from 'path';
 
 function playlist() {
 const app1 = express();
-const pathToBuild = path.resolve() + "\\build\\resources\\";
 
 app1.use(express.json());
 
-app1.get("/allPlaylists", function (req, res) {
-  fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
-    res.end(data);
-  });
-});
+// app1.get("/allPlaylists", function (req, res) {
+//   fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
+//     res.end(data);
+//   });
+// });
 
 // app.post("/addPlaylist", function (req, res) {
 //   // First read existing users.

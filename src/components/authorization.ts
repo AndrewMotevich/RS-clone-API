@@ -14,11 +14,11 @@ function authorization() {
         origin: 'http://127.0.0.1:5500',
         credentials: true,
     };
-    const findOneByUserName = async (userName: string) => {
+    const findOneByUserName = async (email: string) => {
         return await client
             .db('myDatabase')
             .collection('users')
-            .findOne({ userName: `${userName}` });
+            .findOne({ email: `${email}` });
     };
 
     const hash = (string: string) => {
@@ -43,12 +43,12 @@ function authorization() {
         }
     });
 
-    app.post('/addUser', function (req, res) {
-        if (req.cookies['is-logged-in'] === 'false') {
+    app.post('/addUser',async function (req, res) {
+        if (req.cookies['is-logged-in'] === 'false' || req.cookies['is-logged-in'] === undefined) {
             const reqData = req.body as user;
             //check email
-            findOneByUserName(reqData.email).then(async (data) => {
-                if (data != null && Object.keys(reqData).length === 4) {
+            await findOneByUserName(reqData.email).then(async (data) => {
+                if (data === null && Object.keys(reqData).length === 4) {
                     await client.db('myDatabase').collection('users').insertOne(reqData);
                     res.end(JSON.stringify(reqData));
                 } else {
@@ -63,11 +63,11 @@ function authorization() {
     });
 
     app.get('/:email', async function (req, res) {
-        const user = await client
-            .db('myDatabase')
-            .collection('users')
-            .findOne({ userName: `${req.params.email}` });
         try {
+            const user = await client
+                .db('myDatabase')
+                .collection('users')
+                .findOne({ email: `${req.params.email}` });
             if (user === null) {
                 res.status(404);
                 res.end('This user do not exist or incorrect email');
@@ -84,7 +84,6 @@ function authorization() {
                     if (req.headers['hash-pass'] === userHashPassword) {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
-                        res.cookie('id', `${user._id}`);
                         res.end(JSON.stringify(user));
                     }
                     else {
@@ -99,62 +98,61 @@ function authorization() {
         }
     });
 
-    // app.delete('/deleteUser/:id', function (req, res) {
-    //     if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === req.params.id.toString()) {
-    //         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-    //             const newData = JSON.parse(data) as user[];
-    //             newData.forEach((elem, index) => {
-    //                 if (elem.id == Number(req.params.id)) {
-    //                     newData.splice(index, 1);
-    //                     fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
-    //                         return err;
-    //                     });
-    //                 }
-    //             });
-    //             res.end(JSON.stringify(newData));
-    //         });
-    //     } else {
-    //         res.status(500);
-    //         res.end('You are not logged in or incorrect id');
-    //     }
-    // });
+    app.delete('/deleteUser/:email',async function (req, res) {
+        if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
+            try {
+                const user = await client
+                  .db("myDatabase")
+                  .collection("users")
+                  .findOne({ email: `${req.params.email}` });
+                if (user === null) {
+                  res.status(404);
+                  res.end("This user do not exist");
+                } else {
+                  await client
+                    .db("myDatabase")
+                    .collection("users")
+                    .deleteOne({ email: `${req.params.email}` });
+                  res.end("This user deleted");
+                }
+              } catch (err) {
+                res.status(500);
+                res.end(err);
+              }
+        } else {
+            res.status(500);
+            res.end('You are not logged in or incorrect email');
+        }
+    });
 
-    // app.patch('/updateUser', function (req, res) {
-    //     const reqData = req.body as user;
-    //     if (req.cookies['is-logged-in'] === 'true' && req.cookies['id'] === reqData.id.toString()) {
-    //         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-    //             try {
-    //                 const newData = JSON.parse(data) as user[];
-    //                 let exist = false;
-    //                 newData.forEach((elem) => {
-    //                     if (elem.email === reqData.email && elem.id !== reqData.id) {
-    //                         res.status(500);
-    //                     } else if (elem.id === reqData.id) {
-    //                         elem.email = reqData.email;
-    //                         elem.phone = reqData.phone;
-    //                         elem.userName = reqData.userName;
-    //                         elem.userPassword = reqData.userPassword;
-    //                         exist = true;
-    //                     }
-    //                 });
-    //                 if (exist === false || res.statusCode === 500) {
-    //                     res.status(500);
-    //                     res.end("This user don't exist");
-    //                 } else {
-    //                     fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
-    //                         return err;
-    //                     });
-    //                     res.end(JSON.stringify(newData));
-    //                 }
-    //             } catch (err) {
-    //                 return err;
-    //             }
-    //         });
-    //     } else {
-    //         res.status(500);
-    //         res.end('You are not logged in or incorrect logged in user(you cant update other users)');
-    //     }
-    // });
+    app.patch('/updateUser/:email', async function (req, res) {
+        const reqData = req.body as user;
+        if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
+            try {
+                const user = await client
+                  .db("myDatabase")
+                  .collection("users")
+                  .findOne({ email: `${req.params.email}` });
+                if (user === null) {
+                  res.status(404);
+                  res.end("This user do not exist");
+                } else {
+                  await client
+                    .db("myDatabase")
+                    .collection("users")
+                    .updateOne({ email: `${req.params.email}` }, { $set: reqData });
+                  res.end(JSON.stringify(reqData));
+                }
+            }
+            catch (err) {
+                res.status(500);
+                res.end(err);
+              }
+        } else {
+            res.status(500);
+            res.end('You are not logged in or incorrect logged in user(you cant update other users)');
+        }
+    });
 
     const server = app.listen(8081, function () {
         const host = (server.address() as address).address;

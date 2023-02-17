@@ -7,14 +7,6 @@ module.exports = {
   devtool: "eval-source-map",
   mode: "development",
   entry: path.resolve(__dirname, './src/index.ts'),
-  devServer: {
-    watchFiles: ["./src"],
-    liveReload: true,
-    hot: true,
-    static: {
-      directory: path.join(__dirname, 'build'),
-    },
-  },
   module: {
     rules: [
       //ts loader
@@ -23,14 +15,6 @@ module.exports = {
         use: "ts-loader",
         include: [path.resolve(__dirname, "src")]
       },
-      //json loader
-      // {
-      //   test: /\.(json)$/i,
-      //   type: "asset/resource",
-      //   generator: {
-      //     filename: 'resources/[name][ext]'
-      //   }
-      // }
     ]
   },
   resolve: {
@@ -49,6 +33,7 @@ module.exports = {
   "cors": "require('cors')",
   "crypto": "require('crypto')",
   "fs": "require('fs')",
-  "path": "require('path')"
+  "path": "require('path')",
+  "mongodb": "require('mongodb')"
 }
 };
