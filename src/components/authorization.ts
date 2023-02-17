@@ -14,6 +14,12 @@ function authorization() {
         origin: 'http://127.0.0.1:5500',
         credentials: true,
     };
+    const findOneByUserName = async (userName: string) => {
+        return await client
+            .db('myDatabase')
+            .collection('users')
+            .findOne({ userName: `${userName}` });
+    };
 
     const hash = (string: string) => {
         let result = 0;
@@ -39,29 +45,16 @@ function authorization() {
 
     app.post('/addUser', function (req, res) {
         if (req.cookies['is-logged-in'] === 'false') {
-            // First read existing users.
-            const reqData = req.body;
-            fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
-                try {
-                    const newData = JSON.parse(data) as user[];
-                    const newId = newData[`${newData.length - 1}`].id + 1;
-                    newData.forEach((elem) => {
-                        if (elem.email === reqData.email) {
-                            res.status(500);
-                            res.end('THIS EMAIL EXIST');
-                        }
-                    });
-                    reqData.id = newId;
-                    newData.push(reqData);
-                    res.cookie('email', `${hash(reqData.email)}`);
-                    res.cookie('is-logged-in', 'true');
-                    res.cookie('id', `${reqData.id}`);
-                    fs.writeFile(pathToBuild + 'users.json', JSON.stringify(newData), {}, (err) => {
-                        return err;
-                    });
-                    res.end(JSON.stringify(newData));
-                } catch (err) {
-                    return err;
+            const reqData = req.body as user;
+            //check email
+            findOneByUserName(reqData.email).then(async (data) => {
+                if (data != null) {
+                    await client.db('myDatabase').collection('users').insertOne(reqData);
+                    res.end(JSON.stringify(reqData));
+                }
+                else {
+                  res.status(500);
+                  res.end("This user exist");
                 }
             });
         } else {
@@ -71,7 +64,6 @@ function authorization() {
     });
 
     app.get('/:email', function (req, res) {
-        // First read existing users.
         fs.readFile(pathToBuild + 'users.json', 'utf8', function (err, data) {
             const users = JSON.parse(data) as user[];
             let user = {};
