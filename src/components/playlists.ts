@@ -1,4 +1,4 @@
-import { app } from './authorization';
+import { app, hash } from './authorization';
 import { client } from './authorization';
 
 function library() {
@@ -12,6 +12,25 @@ app.get("/allPlaylists", async function (req, res) {
     res.end('!!!Get out intruder!!!');
 }
 });
+
+// app.post('/addUserLibrary',async function (req, res) {
+//   if (req.cookies['is-logged-in'] === 'false' && hash(req.params.email)) {
+//       const reqData = req.body as user;
+//       //check email
+//       await findOneByUserName(reqData.email).then(async (data) => {
+//           if (data === null && Object.keys(reqData).length === 4) {
+//               await client.db('myDatabase').collection('users').insertOne(reqData);
+//               res.end(JSON.stringify(reqData));
+//           } else {
+//               res.status(500);
+//               res.end('This user exist');
+//           }
+//       });
+//   } else {
+//       res.status(500);
+//       res.end('You are logged in, please, sign out');
+//   }
+// });
 
 // app.post("/addPlaylist", function (req, res) {
 //   // First read existing users.

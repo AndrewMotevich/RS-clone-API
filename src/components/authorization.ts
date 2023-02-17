@@ -7,8 +7,15 @@ import { MongoClient } from 'mongodb';
 const cloudURI =
     'mongodb+srv://vercel-admin-user:MCm8xsb6HBmZkcGP@cluster0.b23op1h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 const client = new MongoClient(cloudURI);
-
 const app = express();
+const hash = (string: string) => {
+    let result = 0;
+    for (let i = 0; i < string.length; i++) {
+        result += string.charCodeAt(i) + 7;
+    }
+    return result.toString();
+};
+
 function authorization() {
     const corsOptions = {
         origin: 'http://127.0.0.1:5500',
@@ -19,14 +26,6 @@ function authorization() {
             .db('myDatabase')
             .collection('users')
             .findOne({ email: `${email}` });
-    };
-
-    const hash = (string: string) => {
-        let result = 0;
-        for (let i = 0; i < string.length; i++) {
-            result += string.charCodeAt(i) + 7;
-        }
-        return result.toString();
     };
 
     app.use(express.json());
@@ -43,13 +42,20 @@ function authorization() {
         }
     });
 
-    app.post('/addUser',async function (req, res) {
+    app.post('/addUser', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'false' || req.cookies['is-logged-in'] === undefined) {
             const reqData = req.body as user;
+            const libraryTemplate = {
+                email: `${reqData.email}`,
+                likedPodcasts: [],
+                subscribedPodcasts: [],
+            };
             //check email
             await findOneByUserName(reqData.email).then(async (data) => {
                 if (data === null && Object.keys(reqData).length === 4) {
                     await client.db('myDatabase').collection('users').insertOne(reqData);
+                    //add library template
+                    await client.db('podcastLibrary').collection('library').insertOne(libraryTemplate);
                     res.end(JSON.stringify(reqData));
                 } else {
                     res.status(500);
@@ -85,8 +91,7 @@ function authorization() {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
                         res.end(JSON.stringify(user));
-                    }
-                    else {
+                    } else {
                         res.status(500);
                         res.end('Incorrect password');
                     }
@@ -98,27 +103,32 @@ function authorization() {
         }
     });
 
-    app.delete('/deleteUser/:email',async function (req, res) {
+    app.delete('/deleteUser/:email', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
             try {
                 const user = await client
-                  .db("myDatabase")
-                  .collection("users")
-                  .findOne({ email: `${req.params.email}` });
+                    .db('myDatabase')
+                    .collection('users')
+                    .findOne({ email: `${req.params.email}` });
                 if (user === null) {
-                  res.status(404);
-                  res.end("This user do not exist");
+                    res.status(404);
+                    res.end('This user do not exist');
                 } else {
-                  await client
-                    .db("myDatabase")
-                    .collection("users")
-                    .deleteOne({ email: `${req.params.email}` });
-                  res.end("This user deleted");
+                    await client
+                        .db('myDatabase')
+                        .collection('users')
+                        .deleteOne({ email: `${req.params.email}` });
+                    // delete user library
+                    await client
+                        .db('podcastLibrary')
+                        .collection('library')
+                        .deleteOne({ email: `${req.params.email}` });
+                    res.end('This user deleted');
                 }
-              } catch (err) {
+            } catch (err) {
                 res.status(500);
                 res.end(err);
-              }
+            }
         } else {
             res.status(500);
             res.end('You are not logged in or incorrect email');
@@ -130,24 +140,23 @@ function authorization() {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
             try {
                 const user = await client
-                  .db("myDatabase")
-                  .collection("users")
-                  .findOne({ email: `${req.params.email}` });
+                    .db('myDatabase')
+                    .collection('users')
+                    .findOne({ email: `${req.params.email}` });
                 if (user === null) {
-                  res.status(404);
-                  res.end("This user do not exist");
+                    res.status(404);
+                    res.end('This user do not exist');
                 } else {
-                  await client
-                    .db("myDatabase")
-                    .collection("users")
-                    .updateOne({ email: `${req.params.email}` }, { $set: reqData });
-                  res.end(JSON.stringify(reqData));
+                    await client
+                        .db('myDatabase')
+                        .collection('users')
+                        .updateOne({ email: `${req.params.email}` }, { $set: reqData });
+                    res.end(JSON.stringify(reqData));
                 }
-            }
-            catch (err) {
+            } catch (err) {
                 res.status(500);
                 res.end(err);
-              }
+            }
         } else {
             res.status(500);
             res.end('You are not logged in or incorrect logged in user(you cant update other users)');
@@ -161,4 +170,4 @@ function authorization() {
     });
 }
 
-export {authorization, app, client};
+export { authorization, app, client, hash };
