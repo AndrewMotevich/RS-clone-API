@@ -8,8 +8,8 @@ const cloudURI =
     'mongodb+srv://vercel-admin-user:MCm8xsb6HBmZkcGP@cluster0.b23op1h.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 const client = new MongoClient(cloudURI);
 
+const app = express();
 function authorization() {
-    const app = express();
     const corsOptions = {
         origin: 'http://127.0.0.1:5500',
         credentials: true,
@@ -161,4 +161,4 @@ function authorization() {
     });
 }
 
-export default authorization;
+export {authorization, app, client};

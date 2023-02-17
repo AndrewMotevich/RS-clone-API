@@ -1,16 +1,17 @@
-import { address } from './type';
-import express from 'express';
+import { app } from './authorization';
+import { client } from './authorization';
 
-function playlist() {
-const app1 = express();
+function library() {
 
-app1.use(express.json());
-
-// app1.get("/allPlaylists", function (req, res) {
-//   fs.readFile(pathToBuild + "playlists.json", "utf8", function (err, data) {
-//     res.end(data);
-//   });
-// });
+app.get("/allPlaylists", async function (req, res) {
+  if (req.headers['admin-pass'] === 'root') {
+    const usersArray = await client.db('podcastLibrary').collection('library').find().toArray();
+    res.end(JSON.stringify(usersArray));
+} else {
+    res.status(500);
+    res.end('!!!Get out intruder!!!');
+}
+});
 
 // app.post("/addPlaylist", function (req, res) {
 //   // First read existing users.
@@ -52,12 +53,6 @@ app1.use(express.json());
 //     res.end(JSON.stringify(req.params));
 //   });
 // });
-
-const server = app1.listen(8082, function () {
-  const host = (server.address() as address).address;
-  const port = (server.address() as address).port;
-  console.log("Example app listening at http://%s:%s", host, port);
-});
 }
 
-export default playlist;
+export default library;

@@ -1,3 +1,4 @@
+//not use now
 type podcastCard = {
     categories: object;
     description: string;
@@ -10,7 +11,7 @@ type podcastCard = {
     title: string;
     url: string;
 };
-
+//not use now
 type episode = {
     // chaptersUrl: null,
     dateCrawled: number;

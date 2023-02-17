@@ -1,4 +1,4 @@
-import authorization from './components/authorization';
-// import playlist from './components/playlists';
+import { authorization } from './components/authorization';
+import library from './components/playlists';
+library();
 authorization();
-// playlist();
