@@ -6,6 +6,10 @@
 - **email**
 - **playlistName**
 ***
+## Cookies:
+* **"email"**
+* **"is-logged-in"**
+***
 ### Fetch request example
 ```
 var myHeaders = new Headers();

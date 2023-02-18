@@ -1,11 +1,11 @@
 # Authorization api module
 ## Methods:
- * [GET /listUsers]()
- * [GET /signIn]()
- * [GET /signOut]()
- * [POST /addUser]()
- * [PATCH /updateUser]()
- * [DELETE /deleteUser]()
+ * [GET /listUsers](./authMethods/listUsers.md)
+ * [GET /signIn](./authMethods/signIn.md)
+ * [GET /signOut](./authMethods/signOut.md)
+ * [POST /addUser](./authMethods/addUser.md)
+ * [PATCH /updateUser](./authMethods/updateUser.md)
+ * [DELETE /deleteUser](./authMethods/deleteUser.md)
 ***
 ## Cookies:
 
@@ -33,6 +33,7 @@
   ));
   return matches ? decodeURIComponent(matches[1]) : undefined;
   }
+  ```
 ***
 ## Headers:
 * **"hash-pass"**

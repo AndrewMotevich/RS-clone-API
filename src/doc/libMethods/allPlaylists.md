@@ -2,6 +2,9 @@
 ## Path
 ### rs-clone-api.vercel.app/allPlaylists
 ***
+## Headers
+* **"admin-pass"** **"root"**
+***
 ### Example fetch request
 ```var myHeaders = new Headers();
 myHeaders.append("admin-pass", "root");

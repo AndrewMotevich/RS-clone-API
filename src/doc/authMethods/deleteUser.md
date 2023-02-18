@@ -1,14 +1,9 @@
-# DELETE /removePlaylist
+# DELETE /updateUser
 ## Path
-### rs-clone-api.vercel.app/removePlaylist **(*/:email*/*:playlistName*)**
+### rs-clone-api.vercel.app/deleteUser **(*/:email*)**
 ***
-## Path Variables
+### Path Variables
 - **email**
-- **playlistName**
-***
-## Cookies:
-* **"email"**
-* **"is-logged-in"**
 ***
 ### Fetch request example
 ```
@@ -21,7 +16,8 @@ var requestOptions = {
   redirect: 'follow'
 };
 
-fetch("rs-clone-api.vercel.app/removePlaylist/kshusha@gmail.com/MyOwnPlaylist999", requestOptions)
+fetch("rs-clone-api.vercel.app/deleteUser/kshusha@gmail.com", requestOptions)
   .then(response => response.text())
   .then(result => console.log(result))
   .catch(error => console.log('error', error));
+```
