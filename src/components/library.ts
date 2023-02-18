@@ -72,6 +72,22 @@ function library() {
             res.end('You are not logged in or incorrect email');
         }
     });
+
+    app.delete('/removeItemToPlaylist/:email/:playlistName/:itemId', async function (req, res) {
+        if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
+            const newItem = {};
+            const itemIdObj = { id: `${req.params.itemId}` };
+            Object.defineProperty(newItem, `${req.params.playlistName}`, itemIdObj);
+            await client
+                .db('podcastLibrary')
+                .collection('library')
+                .updateMany({ email: 'kshusha@gmail.com' }, { $pull: newItem });
+            res.end(`Item with id:${req.params.itemId} was deleted`);
+        } else {
+            res.status(500);
+            res.end('You are not logged in or incorrect email');
+        }
+    });
 }
 
 export default library;
