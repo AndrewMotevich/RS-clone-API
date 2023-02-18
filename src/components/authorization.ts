@@ -74,6 +74,7 @@ function authorization() {
                 .db('myDatabase')
                 .collection('users')
                 .findOne({ email: `${req.params.email}` });
+            // user library
             const userLibrary = await client
                 .db('podcastLibrary')
                 .collection('library')
