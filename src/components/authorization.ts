@@ -18,8 +18,10 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: '*',
+        origin: 'http://127.0.0.1:8080/',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+        allowedHeaders: ['admin-pass']
     };
     const findOneByUserName = async (email: string) => {
         return await client
