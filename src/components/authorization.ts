@@ -18,8 +18,10 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: false,
-        credentials: true,
+        origin: '*',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     };
     const findOneByUserName = async (email: string) => {
         return await client
