@@ -18,7 +18,7 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: 'http://127.0.0.1:8080/',
+        origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         allowedHeaders: ['admin-pass']
@@ -33,8 +33,8 @@ function authorization() {
     app.use(express.json());
     app.use(cors(corsOptions));
     app.use(cookieParser());
-    app.get('/listUsers', async function (req, res) {
-        if (req.headers['admin-pass'] === 'root') {
+    app.get('/listUsers/:pass', async function (req, res) {
+        if (req.params.pass === 'root') {
             const usersArray = await client.db('myDatabase').collection('users').find().toArray();
             res.end(JSON.stringify(usersArray));
         } else {
