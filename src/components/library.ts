@@ -65,7 +65,7 @@ function library() {
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: 'kshusha@gmail.com' }, { $addToSet: newItem });
+                .updateMany({ email: `${req.params.email}` }, { $addToSet: newItem });
             res.end(`Item with id:${req.params.itemId} was added`);
         } else {
             res.status(500);
@@ -81,8 +81,27 @@ function library() {
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: 'kshusha@gmail.com' }, { $pull: newItem });
+                .updateMany({ email: `${req.params.email}` }, { $pull: newItem });
             res.end(`Item with id:${req.params.itemId} was deleted`);
+        } else {
+            res.status(500);
+            res.end('You are not logged in or incorrect email');
+        }
+    });
+
+    app.delete('/removePlaylist/:email/:playlistName', async function (req, res) {
+        if (
+            req.cookies['is-logged-in'] === 'true' &&
+            req.cookies['email'] === hash(req.params.email) &&
+            checkStatePlaylists(req.params.playlistName)
+        ) {
+            const removedPlaylist = {};
+            Object.defineProperty(removedPlaylist, `${req.params.playlistName}`, '');
+            await client
+                .db('podcastLibrary')
+                .collection('library')
+                .updateMany({ email: `${req.params.email}` }, { $unset: removedPlaylist });
+            res.end(`Playlist ${req.params.playlistName} was deleted`);
         } else {
             res.status(500);
             res.end('You are not logged in or incorrect email');
