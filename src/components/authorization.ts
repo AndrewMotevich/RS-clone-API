@@ -34,8 +34,8 @@ function authorization() {
     // app.use(cors(corsOptions));
     app.use(cors());
     app.use(cookieParser());
-    app.get('/listUsers/:pass', async function (req, res) {
-        if (req.params.pass === 'root') {
+    app.get('/listUsers', async function (req, res) {
+        if (req.headers['authorization'] === 'root') {
             const usersArray = await client.db('myDatabase').collection('users').find().toArray();
             res.end(JSON.stringify(usersArray));
         } else {
