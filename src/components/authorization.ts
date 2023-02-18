@@ -18,7 +18,7 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: ['http://127.0.0.1:5500', 'http://127.0.0.1:8080', 'http://192.168.100.34:8080', 'http://localhost:8080/'],
+        origin: 'http://127.0.0.1:5500',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         allowedHeaders: ['admin-pass']
