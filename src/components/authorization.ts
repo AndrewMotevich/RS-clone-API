@@ -68,11 +68,15 @@ function authorization() {
         }
     });
 
-    app.get('/:email', async function (req, res) {
+    app.get('/signIn/:email', async function (req, res) {
         try {
             const user = await client
                 .db('myDatabase')
                 .collection('users')
+                .findOne({ email: `${req.params.email}` });
+            const userLibrary = await client
+                .db('podcastLibrary')
+                .collection('library')
                 .findOne({ email: `${req.params.email}` });
             if (user === null) {
                 res.status(404);
@@ -80,7 +84,7 @@ function authorization() {
             } else {
                 if (
                     req.cookies['email'] != undefined &&
-                    req.cookies['email'] === hash(req.params.email).toString() &&
+                    req.cookies['email'] === hash(req.params.email) &&
                     req.cookies['is-logged-in'] === 'true'
                 ) {
                     console.log('Get from cookies: ', req.cookies);
@@ -90,6 +94,7 @@ function authorization() {
                     if (req.headers['hash-pass'] === userHashPassword) {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
+                        res.cookie('library', `${JSON.stringify(userLibrary)}`);
                         res.end(JSON.stringify(user));
                     } else {
                         res.status(500);
@@ -103,8 +108,28 @@ function authorization() {
         }
     });
 
+    app.get('/signOut/:email', async function (req, res) {
+        if (
+            req.cookies['email'] != undefined &&
+            req.cookies['is-logged-in'] === 'true' &&
+            req.cookies['email'] === hash(req.params.email)
+        ) {
+            res.clearCookie('email');
+            res.clearCookie('is-logged-in');
+            res.clearCookie('library');
+            res.end('You are signOut');
+        } else {
+            res.end('Incorrect email or you are not sign in');
+            res.status(500);
+        }
+    });
+
     app.delete('/deleteUser/:email', async function (req, res) {
-        if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
+        if (
+            req.cookies['is-logged-in'] === 'true' &&
+            req.cookies['email'] === hash(req.params.email) &&
+            req.cookies['email'] === hash(req.params.email)
+        ) {
             try {
                 const user = await client
                     .db('myDatabase')

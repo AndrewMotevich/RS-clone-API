@@ -14,8 +14,9 @@ function library() {
   });
   
   app.patch('/addNewPlaylist/:email/:playlistName', async function (req, res) {
-  // const checkStatePlaylists = req.params.playlistName != "likedPodcasts" && req.params.playlistName != 'subscribedPodcasts';
-  if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)){
+  const checkLikedPodcasts = req.params.playlistName != "likedPodcasts"; 
+  const checkSubscribedPodcasts = req.params.playlistName != 'subscribedPodcasts';
+  if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email) && checkSubscribedPodcasts && checkLikedPodcasts){
     const newPlaylist = {};
     Object.defineProperty(newPlaylist, `${req.params.playlistName}`, []);
     await client.db('podcastLibrary').collection('library').updateOne({"email": `${req.params.email}`},{$set : newPlaylist });
