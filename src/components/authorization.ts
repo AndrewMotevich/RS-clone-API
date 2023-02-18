@@ -1,6 +1,6 @@
 import { user, address } from './type';
 import express from 'express';
-import cors from 'cors';
+// import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { MongoClient } from 'mongodb';
 
@@ -17,14 +17,14 @@ const hash = (string: string) => {
 };
 
 function authorization() {
-    const corsOptions = {
-        origin: true,
-        methods: 'GET,PATCH,POST,DELETE,OPTIONS',
-        credentials: true,
-        allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin', 'accept'],
-        // exposedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
-        // preflightContinue: true,
-    };
+    // const corsOptions = {
+    //     origin: true,
+    //     methods: 'GET,PATCH,POST,DELETE,OPTIONS',
+    //     credentials: true,
+    //     allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin', 'accept'],
+    //     exposedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
+    //     preflightContinue: true,
+    // };
     const findOneByUserName = async (email: string) => {
         return await client
             .db('myDatabase')
@@ -33,7 +33,7 @@ function authorization() {
     };
 
     app.use(express.json());
-    app.use(cors(corsOptions));
+    // app.use(cors(corsOptions));
     app.use(cookieParser());
     app.get('/listUsers', async function (req, res) {
         console.log(req.headers);
