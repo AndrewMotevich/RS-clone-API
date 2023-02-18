@@ -36,14 +36,23 @@ function authorization() {
     // app.use(cors(corsOptions));
     app.use(cookieParser());
     app.get('/listUsers', async function (req, res) {
-        console.log(req.headers);
-        console.log(req.cookies);
-        if (req.headers['authorization'] === 'root') {
-            const usersArray = await client.db('myDatabase').collection('users').find().toArray();
-            res.end(JSON.stringify(usersArray));
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Origin', `${req.headers['origin']}`);
+        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+        res.setHeader(
+            'Access-Control-Allow-Headers',
+            'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, authorization, X-Api-Version'
+        );
+        if (req.method === 'OPTIONS') {
+            res.status(200).end();
         } else {
-            res.status(500);
-            res.end('!!!Get out intruder!!!');
+            if (req.headers['authorization'] === 'root') {
+                const usersArray = await client.db('myDatabase').collection('users').find().toArray();
+                res.end(JSON.stringify(usersArray));
+            } else {
+                res.status(500);
+                res.end('!!!Get out intruder!!!');
+            }
         }
     });
 
