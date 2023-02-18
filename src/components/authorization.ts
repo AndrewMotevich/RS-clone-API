@@ -19,11 +19,11 @@ const hash = (string: string) => {
 function authorization() {
     const corsOptions = {
         origin: true,
-        methods: 'GET,PATCH,POST,DELETE',
+        methods: 'GET,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
-        allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
+        allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin', 'accept'],
         // exposedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
-        preflightContinue: true,
+        // preflightContinue: true,
     };
     const findOneByUserName = async (email: string) => {
         return await client
