@@ -17,12 +17,14 @@ const hash = (string: string) => {
 };
 
 function authorization() {
-    // const corsOptions = {
-    //     origin: 'http://127.0.0.1:5500',
-    //     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    //     credentials: true,
-    //     allowedHeaders: ['admin-pass']
-    // };
+    const corsOptions = {
+        origin: true,
+        methods: 'GET,PATCH,POST,DELETE',
+        credentials: true,
+        allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
+        // exposedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
+        preflightContinue: true,
+    };
     const findOneByUserName = async (email: string) => {
         return await client
             .db('myDatabase')
@@ -31,10 +33,11 @@ function authorization() {
     };
 
     app.use(express.json());
-    // app.use(cors(corsOptions));
-    app.use(cors());
+    app.use(cors(corsOptions));
     app.use(cookieParser());
     app.get('/listUsers', async function (req, res) {
+        console.log(req.headers);
+        console.log(req.cookies);
         if (req.headers['authorization'] === 'root') {
             const usersArray = await client.db('myDatabase').collection('users').find().toArray();
             res.end(JSON.stringify(usersArray));
@@ -71,6 +74,8 @@ function authorization() {
     });
 
     app.get('/signIn/:email', async function (req, res) {
+        console.log(req.headers);
+        console.log(req.cookies);
         try {
             const user = await client
                 .db('myDatabase')
@@ -93,7 +98,7 @@ function authorization() {
                     res.end(JSON.stringify(user));
                 } else {
                     const userHashPassword = hash(user.userPassword);
-                    if (req.headers['hash-pass'] === userHashPassword) {
+                    if (req.headers['x-hash-pass'] === userHashPassword) {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
                         res.cookie('library', `${JSON.stringify(userLibrary)}`);
