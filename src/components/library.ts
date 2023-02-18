@@ -42,11 +42,6 @@ function library() {
                 .db('podcastLibrary')
                 .collection('library')
                 .updateOne({ email: `${req.params.email}` }, { $set: { [playlistName]: [] } });
-            const users1 = await client
-                .db('podcastLibrary')
-                .collection('library')
-                .findOne({ email: `${req.params.email}` });
-            console.log(users1);
             res.end(`Playlist ${req.params.playlistName} was added`);
         } else {
             res.status(500);

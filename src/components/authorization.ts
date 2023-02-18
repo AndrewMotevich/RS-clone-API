@@ -88,7 +88,6 @@ function authorization() {
                     req.cookies['email'] === hash(req.params.email) &&
                     req.cookies['is-logged-in'] === 'true'
                 ) {
-                    console.log('Get from cookies: ', req.cookies);
                     res.end(JSON.stringify(user));
                 } else {
                     const userHashPassword = hash(user.userPassword);
