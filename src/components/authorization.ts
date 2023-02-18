@@ -18,7 +18,7 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: "*",
+        origin: "http://localhost:8080/",
         credentials: true,
     };
     const findOneByUserName = async (email: string) => {
