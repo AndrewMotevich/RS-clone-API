@@ -1,8 +1,8 @@
 import { app, hash } from './authorization';
-import express from 'express';
+// import express from 'express';
 import { client } from './authorization';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
+// import cors from 'cors';
 import { AddToSetOperators } from 'mongodb';
 import { PullOperator } from 'mongodb';
 
@@ -22,7 +22,7 @@ function library() {
     }
 
     app.get('/allPlaylists', async function (req, res) {
-        if (req.headers['admin-pass'] === 'root') {
+        if (req.headers['x-admin-pass'] === 'root') {
             const usersArray = await client.db('podcastLibrary').collection('library').find().toArray();
             res.end(JSON.stringify(usersArray));
         } else {

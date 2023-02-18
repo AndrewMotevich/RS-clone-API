@@ -1,6 +1,6 @@
 import { user, address } from './type';
 import express from 'express';
-// import cors from 'cors';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { MongoClient } from 'mongodb';
 
@@ -17,14 +17,12 @@ const hash = (string: string) => {
 };
 
 function authorization() {
-    // const corsOptions = {
-    //     origin: true,
-    //     methods: 'GET,PATCH,POST,DELETE,OPTIONS',
-    //     credentials: true,
-    //     allowedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin', 'accept'],
-    //     exposedHeaders: ['content-Type', 'authorization', 'x-hash-pass', 'x-admin-pass', 'origin'],
-    //     preflightContinue: true,
-    // };
+    const corsOptions = {
+        origin: true,
+        methods: 'GET,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: ['Content-Type', 'Content-MD5', 'Authorization', 'X-admin-pass', 'X-hash-pass', 'Access', 'X-CSRF-Token', 'Date', 'Accept-Version', 'Content-Length'],
+        credentials: true,
+    };
     const findOneByUserName = async (email: string) => {
         return await client
             .db('myDatabase')
@@ -33,27 +31,16 @@ function authorization() {
     };
 
     app.use(express.json());
-    // app.use(cors(corsOptions));
+    app.use(cors(corsOptions));
     app.use(cookieParser());
     app.get('/listUsers', async function (req, res) {
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', `${req.headers['origin']}`);
-        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-        res.setHeader(
-            'Access-Control-Allow-Headers',
-            'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, authorization, X-Api-Version'
-        );
-        if (req.method === 'OPTIONS') {
-            res.status(200).end();
-        } else {
-            if (req.headers['authorization'] === 'root') {
+            if (req.headers['x-admin-pass'] === 'root') {
                 const usersArray = await client.db('myDatabase').collection('users').find().toArray();
                 res.end(JSON.stringify(usersArray));
             } else {
                 res.status(500);
                 res.end('!!!Get out intruder!!!');
             }
-        }
     });
 
     app.post('/addUser', async function (req, res) {
@@ -83,8 +70,6 @@ function authorization() {
     });
 
     app.get('/signIn/:email', async function (req, res) {
-        console.log(req.headers);
-        console.log(req.cookies);
         try {
             const user = await client
                 .db('myDatabase')
