@@ -8,7 +8,7 @@ import { PullOperator } from 'mongodb';
 
 function library() {
     const corsOptions = {
-        origin: false,
+        origin: "*",
         credentials: true,
     };
     app.use(express.json());
