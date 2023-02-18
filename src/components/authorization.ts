@@ -149,6 +149,9 @@ function authorization() {
                         .db('podcastLibrary')
                         .collection('library')
                         .deleteOne({ email: `${req.params.email}` });
+                    res.clearCookie('email');
+                    res.clearCookie('is-logged-in');
+                    res.clearCookie('library');
                     res.end('This user deleted');
                 }
             } catch (err) {

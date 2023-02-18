@@ -1,7 +1,19 @@
 import { app, hash } from './authorization';
+import express from 'express';
 import { client } from './authorization';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { AddToSetOperators } from 'mongodb';
+import { PullOperator } from 'mongodb';
 
 function library() {
+    const corsOptions = {
+        origin: 'http://127.0.0.1:5500',
+        credentials: true,
+    };
+    app.use(express.json());
+    app.use(cors(corsOptions));
+    app.use(cookieParser());
     function checkStatePlaylists(playlist: string) {
         const checkLikedPodcasts = playlist != 'likedPodcasts';
         const checkSubscribedPodcasts = playlist != 'subscribedPodcasts';
@@ -21,16 +33,20 @@ function library() {
 
     app.patch('/addNewPlaylist/:email/:playlistName', async function (req, res) {
         if (
-            req.cookies['is-logged-in'] === 'true' &&
+            req.cookies['is-logged-in'] !== undefined &&
             req.cookies['email'] === hash(req.params.email) &&
             checkStatePlaylists(req.params.playlistName)
         ) {
-            const newPlaylist = {};
-            Object.defineProperty(newPlaylist, `${req.params.playlistName}`, []);
+            const playlistName = req.params.playlistName;
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateOne({ email: `${req.params.email}` }, { $set: newPlaylist });
+                .updateOne({ email: `${req.params.email}` }, { $set: { [playlistName]: [] } });
+            const users1 = await client
+                .db('podcastLibrary')
+                .collection('library')
+                .findOne({ email: `${req.params.email}` });
+            console.log(users1);
             res.end(`Playlist ${req.params.playlistName} was added`);
         } else {
             res.status(500);
@@ -44,12 +60,14 @@ function library() {
             req.cookies['email'] === hash(req.params.email) &&
             checkStatePlaylists(req.params.playlistName)
         ) {
-            const newNameObj = {};
-            Object.defineProperty(newNameObj, `${req.params.playlistName}`, `${req.params.newPlaylistName}`);
+            const playlistName = req.params.playlistName;
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: `${req.params.email}` }, { $rename: newNameObj });
+                .updateMany(
+                    { email: `${req.params.email}` },
+                    { $rename: { [playlistName]: `${req.params.newPlaylistName}` } }
+                );
             res.end(`Playlist ${req.params.playlistName} was renamed to ${req.params.newPlaylistName}`);
         } else {
             res.status(500);
@@ -59,13 +77,14 @@ function library() {
 
     app.post('/addItemToPlaylist/:email/:playlistName/:itemId', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
-            const newItem = {};
+            const playlistName = req.params.playlistName;
             const itemIdObj = { id: `${req.params.itemId}` };
-            Object.defineProperty(newItem, `${req.params.playlistName}`, itemIdObj);
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: `${req.params.email}` }, { $addToSet: newItem });
+                .updateMany({ email: `${req.params.email}` }, {
+                    $addToSet: { [playlistName]: itemIdObj },
+                } as AddToSetOperators<Document>);
             res.end(`Item with id:${req.params.itemId} was added`);
         } else {
             res.status(500);
@@ -73,15 +92,16 @@ function library() {
         }
     });
 
-    app.delete('/removeItemToPlaylist/:email/:playlistName/:itemId', async function (req, res) {
+    app.delete('/removeItemFromPlaylist/:email/:playlistName/:itemId', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
-            const newItem = {};
+            const playlistName = req.params.playlistName;
             const itemIdObj = { id: `${req.params.itemId}` };
-            Object.defineProperty(newItem, `${req.params.playlistName}`, itemIdObj);
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: `${req.params.email}` }, { $pull: newItem });
+                .updateMany({ email: `${req.params.email}` }, {
+                    $pull: { [playlistName]: itemIdObj },
+                } as PullOperator<Document>);
             res.end(`Item with id:${req.params.itemId} was deleted`);
         } else {
             res.status(500);
@@ -95,12 +115,11 @@ function library() {
             req.cookies['email'] === hash(req.params.email) &&
             checkStatePlaylists(req.params.playlistName)
         ) {
-            const removedPlaylist = {};
-            Object.defineProperty(removedPlaylist, `${req.params.playlistName}`, '');
+            const playlistName = req.params.playlistName;
             await client
                 .db('podcastLibrary')
                 .collection('library')
-                .updateMany({ email: `${req.params.email}` }, { $unset: removedPlaylist });
+                .updateMany({ email: `${req.params.email}` }, { $unset: { [playlistName]: '' } });
             res.end(`Playlist ${req.params.playlistName} was deleted`);
         } else {
             res.status(500);
