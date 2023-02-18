@@ -98,6 +98,7 @@ function authorization() {
                         res.cookie('library', `${JSON.stringify(userLibrary)}`);
                         res.end(JSON.stringify(user));
                     } else {
+                        console.log(req.cookies);
                         res.status(500);
                         res.end('Incorrect password');
                     }
