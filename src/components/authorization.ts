@@ -20,8 +20,6 @@ function authorization() {
     const corsOptions = {
         origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
     };
     const findOneByUserName = async (email: string) => {
         return await client
@@ -33,11 +31,6 @@ function authorization() {
     app.use(express.json());
     app.use(cors(corsOptions));
     app.use(cookieParser());
-    app.use(function (req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, admin-pass, Content-Length, X-Requested-With, Accept');
-    });
     app.get('/listUsers', async function (req, res) {
         if (req.headers['admin-pass'] === 'root') {
             const usersArray = await client.db('myDatabase').collection('users').find().toArray();
