@@ -1,4 +1,4 @@
-# POST /allPlaylists
+# GET /allPlaylists
 ## Path
 ### rs-clone-api.vercel.app/allPlaylists
 ***

@@ -4,7 +4,7 @@
  * [PATCH /addNewPlaylist](./libMethods/addNewPlaylist.md)
  * [PATCH /renamePlaylist](./libMethods/renamePlaylist.md)
  * [POST /addItemToPlaylist](./libMethods/addItemToPlaylist.md)
- * [PATCH /removeItemFromPlaylist](./libMethods/removeItemFromPlaylist.md)
+ * [DELETE /removeItemFromPlaylist](./libMethods/removeItemFromPlaylist.md)
  * [DELETE /removePlaylist](./libMethods/removePlaylist.md)
 ***
 ## Cookies:
