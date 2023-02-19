@@ -20,7 +20,7 @@ function authorization() {
     const corsOptions = {
         origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
         methods: 'GET,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: ['X-admin-pass', 'X-hash-pass', "Library"],
+        allowedHeaders: ['X-admin-pass', 'X-hash-pass', 'Library'],
         credentials: true,
         maxAge: 86400,
     };
@@ -35,13 +35,13 @@ function authorization() {
     app.use(cors(corsOptions));
     app.use(cookieParser());
     app.get('/listUsers', async function (req, res) {
-            if (req.headers['x-admin-pass'] === 'root') {
-                const usersArray = await client.db('myDatabase').collection('users').find().toArray();
-                res.end(JSON.stringify(usersArray));
-            } else {
-                res.status(500);
-                res.end('!!!Get out intruder!!!');
-            }
+        if (req.headers['x-admin-pass'] === 'root') {
+            const usersArray = await client.db('myDatabase').collection('users').find().toArray();
+            res.end(JSON.stringify(usersArray));
+        } else {
+            res.status(500);
+            res.end('!!!Get out intruder!!!');
+        }
     });
 
     app.post('/addUser', async function (req, res) {
@@ -76,11 +76,6 @@ function authorization() {
                 .db('myDatabase')
                 .collection('users')
                 .findOne({ email: `${req.params.email}` });
-            // user library
-            const userLibrary = await client
-                .db('podcastLibrary')
-                .collection('library')
-                .findOne({ email: `${req.params.email}` });
             if (user === null) {
                 res.status(404);
                 res.end('This user do not exist or incorrect email');
@@ -96,7 +91,6 @@ function authorization() {
                     if (req.headers['x-hash-pass'] === userHashPassword) {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
-                        res.header('Library', `${JSON.stringify(userLibrary)}`);
                         res.end(JSON.stringify(user));
                     } else {
                         console.log(req.cookies);

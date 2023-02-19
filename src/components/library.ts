@@ -31,6 +31,23 @@ function library() {
         }
     });
 
+    app.get('/userLibrary/:email', async function (req, res) {
+        if (
+            req.cookies['is-logged-in'] !== undefined &&
+            req.cookies['email'] === hash(req.params.email)
+        ) {
+        const userLibrary = await client
+            .db('podcastLibrary')
+            .collection('library')
+            .findOne({ email: `${req.params.email}` });
+        res.end(JSON.stringify(userLibrary));
+        } else
+        {
+            res.status(404);
+            res.end('You are not logged in or incorrect email');
+        }
+    });
+
     app.patch('/addNewPlaylist/:email/:playlistName', async function (req, res) {
         if (
             req.cookies['is-logged-in'] !== undefined &&
