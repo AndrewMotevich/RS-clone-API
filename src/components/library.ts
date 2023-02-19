@@ -1,18 +1,21 @@
 import { app, hash } from './authorization';
-// import express from 'express';
+import express from 'express';
 import { client } from './authorization';
 import cookieParser from 'cookie-parser';
-// import cors from 'cors';
+import cors from 'cors';
 import { AddToSetOperators } from 'mongodb';
 import { PullOperator } from 'mongodb';
 
 function library() {
-    // const corsOptions = {
-    //     origin: '*',
-    //     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    // };
-    // app.use(express.json());
-    // app.use(cors(corsOptions));
+    const corsOptions = {
+        origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+        methods: 'GET,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: ['X-admin-pass', 'X-hash-pass', 'Library'],
+        credentials: true,
+        maxAge: 86400,
+    };
+    app.use(express.json());
+    app.use(cors(corsOptions));
     app.use(cookieParser());
     function checkStatePlaylists(playlist: string) {
         const checkLikedPodcasts = playlist != 'likedPodcasts';
