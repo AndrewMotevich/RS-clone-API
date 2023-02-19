@@ -18,10 +18,11 @@ const hash = (string: string) => {
 
 function authorization() {
     const corsOptions = {
-        origin: true,
+        origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
         methods: 'GET,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: ['Content-Type', 'Content-MD5', 'Authorization', 'X-admin-pass', 'X-hash-pass', 'Access', 'X-CSRF-Token', 'Date', 'Accept-Version', 'Content-Length'],
+        allowedHeaders: ['X-admin-pass', 'X-hash-pass', "Library"],
         credentials: true,
+        maxAge: 86400,
     };
     const findOneByUserName = async (email: string) => {
         return await client
@@ -95,7 +96,7 @@ function authorization() {
                     if (req.headers['x-hash-pass'] === userHashPassword) {
                         res.cookie('email', `${hash(req.params.email)}`);
                         res.cookie('is-logged-in', 'true');
-                        res.cookie('library', `${JSON.stringify(userLibrary)}`);
+                        res.header('Library', `${JSON.stringify(userLibrary)}`);
                         res.end(JSON.stringify(user));
                     } else {
                         console.log(req.cookies);
@@ -118,7 +119,6 @@ function authorization() {
         ) {
             res.clearCookie('email');
             res.clearCookie('is-logged-in');
-            res.clearCookie('library');
             res.end('You are signOut');
         } else {
             res.end('Incorrect email or you are not sign in');
@@ -152,7 +152,6 @@ function authorization() {
                         .deleteOne({ email: `${req.params.email}` });
                     res.clearCookie('email');
                     res.clearCookie('is-logged-in');
-                    res.clearCookie('library');
                     res.end('This user deleted');
                 }
             } catch (err) {
