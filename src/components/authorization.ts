@@ -89,8 +89,8 @@ function authorization() {
                 } else {
                     const userHashPassword = hash(user.userPassword);
                     if (req.headers['x-hash-pass'] === userHashPassword) {
-                        res.cookie('email', `${hash(req.params.email)}`, {sameSite:'none', secure: true, maxAge:86400});
-                        res.cookie('is-logged-in', 'true', {sameSite:'none', secure: true, maxAge:86400});
+                        res.cookie('email', `${hash(req.params.email)}`, {sameSite:'none', secure: true});
+                        res.cookie('is-logged-in', 'true', {sameSite:'none', secure: true});
                         res.end(JSON.stringify(user));
                     } else {
                         console.log(req.cookies);
