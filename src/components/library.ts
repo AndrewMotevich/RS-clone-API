@@ -10,7 +10,7 @@ function library() {
     const corsOptions = {
         origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
         methods: 'GET,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: ['X-admin-pass', 'X-hash-pass', 'Library'],
+        allowedHeaders: ['X-admin-pass', 'X-hash-pass', 'Library', 'Content-Type'],
         credentials: true,
         maxAge: 86400,
     };
