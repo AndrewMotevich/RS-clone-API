@@ -111,8 +111,8 @@ function authorization() {
             req.cookies['is-logged-in'] === 'true' &&
             req.cookies['email'] === hash(req.params.email)
         ) {
-            res.clearCookie('email');
-            res.clearCookie('is-logged-in');
+            res.clearCookie('email', {sameSite:'none', secure: true});
+            res.clearCookie('is-logged-in', {sameSite:'none', secure: true});
             res.end('You are signOut');
         } else {
             res.end('Incorrect email or you are not sign in');
