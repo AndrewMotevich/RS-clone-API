@@ -93,7 +93,7 @@ function library() {
     app.post('/addItemToPlaylist/:email/:playlistName/:itemId', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
             const playlistName = req.params.playlistName;
-            const itemIdObj = { id: `${req.params.itemId}` };
+            const itemIdObj = { id: Number(req.params.itemId) };
             await client
                 .db('podcastLibrary')
                 .collection('library')
@@ -110,7 +110,7 @@ function library() {
     app.delete('/removeItemFromPlaylist/:email/:playlistName/:itemId', async function (req, res) {
         if (req.cookies['is-logged-in'] === 'true' && req.cookies['email'] === hash(req.params.email)) {
             const playlistName = req.params.playlistName;
-            const itemIdObj = { id: `${req.params.itemId}` };
+            const itemIdObj = { id: Number(req.params.itemId) };
             await client
                 .db('podcastLibrary')
                 .collection('library')
