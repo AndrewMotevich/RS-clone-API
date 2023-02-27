@@ -8,7 +8,7 @@ import { PullOperator } from 'mongodb';
 
 function library() {
     const corsOptions = {
-        origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://127.0.0.1:5500', 'podcast-deploy.vercel.app'],
+        origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://127.0.0.1:5500', 'https://podcast-deploy.vercel.app'],
         methods: 'GET,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: ['X-admin-pass', 'X-hash-pass', 'Library', 'Content-Type'],
         credentials: true,
